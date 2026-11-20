@@ -314,7 +314,9 @@ app.post("/api/chat", chatLimit, async (req, res) => {
     // Only a reply that OPENS by declining counts as "no answer". A good answer that
     // merely ends with "I don't have information about <some side detail>" keeps its
     // sources (the old check looked anywhere in the reply and dropped them).
-    const declined = reply.startsWith(OUT_OF_SCOPE) || NO_INFO_OPENING.test(reply);
+    // ...and even then, a reply that goes on to cite a document ("I don't have
+    // information about pet insurance... the Exclusions document says only gnomes are
+    // insurable") is a real answer and keeps its sources.
     const titles = [...new Set(docs.map((doc) => doc.title))]; // best match first
     // Prefer the documents Claude actually named in its reply (all four chunks
     // may come from documents that weren't needed); if it named none, show the
@@ -322,6 +324,7 @@ app.post("/api/chat", chatLimit, async (req, res) => {
     const named = titles.filter((title) =>
       reply.toLowerCase().includes(title.split("—").pop().trim().toLowerCase())
     );
+    const declined = reply.startsWith(OUT_OF_SCOPE) || (NO_INFO_OPENING.test(reply) && named.length === 0);
     const sources = declined ? [] : named.length > 0 ? named : titles.slice(0, 1);
     res.json({ reply, sources, model });
   } catch (error) {

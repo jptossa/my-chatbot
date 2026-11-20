@@ -143,7 +143,21 @@ app.get("/api/health", async (req, res) => {
     console.error("Health check: database unreachable:", error.message);
     // Only the error's short code (e.g. 28P01 wrong password, ENOTFOUND bad host), never
     // its message, which could contain the connection string.
-    status.database_error = String(error.code || error.name || "unknown");
+    // A generic Error has no code, so it is classified from its message instead; the
+    // message itself is never sent.
+    const message = String(error.message || "");
+    const kind = [
+      [/timeout exceeded when trying to connect|timed out/i, "connect-timeout"],
+      [/connection terminated/i, "connection-terminated"],
+      [/tenant or user not found/i, "pooler-user-not-found"],
+      [/password authentication/i, "wrong-password"],
+      [/certificate|self.signed/i, "ssl-certificate"],
+      [/does not exist/i, "missing-table-or-database"],
+      [/ENOTFOUND|getaddrinfo/i, "host-not-found"],
+      [/ECONNREFUSED/i, "connection-refused"],
+      [/lock|migrat/i, "migration"],
+    ].find(([pattern]) => pattern.test(message));
+    status.database_error = String(error.code || (kind ? kind[1] : error.name || "unknown"));
   }
   res.status(status.database_ok ? 200 : 503).json(status);
 });

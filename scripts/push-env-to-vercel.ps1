@@ -5,7 +5,7 @@
 # Pass -BaseUrl https://your-project.vercel.app to also set APP_BASE_URL.
 param([string]$BaseUrl = "")
 
-$names = @("ANTHROPIC_API_KEY", "VOYAGE_API_KEY", "DATABASE_URL", "RESEND_API_KEY")
+$names = @("ANTHROPIC_API_KEY", "VOYAGE_API_KEY", "DATABASE_URL", "RESEND_API_KEY", "APP_BASE_URL")
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent) ".env"
 $values = @{}
 foreach ($line in Get-Content $envFile) {

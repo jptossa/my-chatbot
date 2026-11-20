@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const path = require("path");
 const Anthropic = require("@anthropic-ai/sdk");
 const {
   backend, queryOne, findCurrentConversation, getHistory, logExchange,
@@ -83,7 +84,11 @@ function buildSystemPrompt(docs) {
 const app = express();
 app.set("trust proxy", 1); // behind Vercel's proxy: req.ip is the visitor's address
 app.use(express.json());
-app.use(express.static("public"));
+// Absolute path: on Vercel the working directory isn't the project folder. The explicit
+// "/" route is there because the platform does not always hand "/" to the static handler.
+const PUBLIC_DIR = path.join(__dirname, "public");
+app.use(express.static(PUBLIC_DIR));
+app.get("/", (req, res) => res.sendFile(path.join(PUBLIC_DIR, "index.html")));
 
 // Fixed-window rate limit per visitor address, counted in the database so it holds
 // across serverless instances. 0 turns a limit off. If the counter can't be reached
@@ -136,6 +141,9 @@ app.get("/api/health", async (req, res) => {
     status.chunks = counts.chunks;
   } catch (error) {
     console.error("Health check: database unreachable:", error.message);
+    // Only the error's short code (e.g. 28P01 wrong password, ENOTFOUND bad host), never
+    // its message, which could contain the connection string.
+    status.database_error = String(error.code || error.name || "unknown");
   }
   res.status(status.database_ok ? 200 : 503).json(status);
 });

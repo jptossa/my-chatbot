@@ -19,6 +19,7 @@
   <div id="auth-in" hidden>
     Logged in as <strong id="whoami"></strong>
     <button type="button" id="logout">Log out</button>
+    <a id="admin-link" href="/admin/" hidden>Escalations dashboard</a>
   </div>
   <p id="auth-message"></p>
 
@@ -70,6 +71,8 @@
       authOut.hidden = !!user;
       authIn.hidden = !user;
       whoami.textContent = user ? user.email : "";
+      // Only a convenience: the server itself refuses the admin pages to anyone who is not a reviewer.
+      document.getElementById("admin-link").hidden = !(user && user.isReviewer);
     }
 
     async function postJson(url, body) {

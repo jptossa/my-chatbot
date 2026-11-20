@@ -142,7 +142,7 @@ async function attachUser(req, res, next) {
 
 // --- routes ----------------------------------------------------------------
 
-const publicUser = (user) => ({ id: user.id, email: user.email });
+const publicUser = (user) => ({ id: user.id, email: user.email, isReviewer: user.is_reviewer === true });
 
 function readCredentials(body) {
   const { email, password } = body ?? {};
@@ -190,7 +190,7 @@ function createAuthRouter({ signupLimit = (q, s, n) => n(), loginLimit = (q, s, 
 
     try {
       const user = await queryOne(
-        "SELECT id, email, display_name, password_hash FROM users WHERE lower(email) = lower($1)",
+        "SELECT id, email, display_name, is_reviewer, password_hash FROM users WHERE lower(email) = lower($1)",
         [credentials.email]
       );
       const stored = user ? user.password_hash : await DUMMY_HASH;

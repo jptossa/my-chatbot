@@ -6,36 +6,42 @@
   <title>GnomeGuard Help</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --ground: #f7f6f2;
+      --ground: #f5f7fb;
       --surface: #ffffff;
-      --sunken: #efeee8;
-      --ink: #1b1d1a;
-      --muted: #666a63;
-      --faint: #8a8e86;
-      --line: #e4e2da;
-      --accent: #2c6b4c;          /* gnome-hat green: used on citations and the send button only */
+      --sunken: #eaeef6;
+      --ink: #0e1626;
+      --muted: #566178;
+      --faint: #8591a8;
+      --line: #e1e7f1;
+      --accent: #0f9f6e;           /* emerald */
+      --accent-strong: #047857;    /* text on tints */
+      --accent-2: #0ea5b7;         /* teal end of the gradient */
+      --violet: #7c5cff;           /* glow only */
       --accent-ink: #ffffff;
-      --accent-tint: #e3efe7;
-      --highlight: #f6e7a6;       /* the exact words a claim rests on */
-      --warn-tint: #f5ecd9;
-      --radius: 18px;
-      --font: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-      --display: "Fraunces", Georgia, serif;
+      --accent-tint: #dcf5ea;
+      --brand: linear-gradient(135deg, #10b981 0%, #0ea5b7 100%);
+      --highlight: #ffe98a;
+      --warn-tint: #fff3d6;
+      --radius: 20px;
+      --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --display: "Plus Jakarta Sans", system-ui, sans-serif;
       --panel-w: 400px;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --ground: #141613; --surface: #1c1f1b; --sunken: #232722; --ink: #ecede8; --muted: #a1a69c;
-        --faint: #7c8177; --line: #2e322c; --accent: #6fbf94; --accent-ink: #0f1a13; --accent-tint: #1f3228;
-        --highlight: #5a4f1c; --warn-tint: #332d1d;
+        --ground: #070b12; --surface: #0f1622; --sunken: #172133; --ink: #e9eef7; --muted: #9aa6bc;
+        --faint: #6c7890; --line: #1c2740; --accent: #34d399; --accent-strong: #6ee7b7; --accent-2: #22d3ee;
+        --accent-ink: #04130d; --accent-tint: #0f2e24; --violet: #8b6dff;
+        --brand: linear-gradient(135deg, #34d399 0%, #22d3ee 100%);
+        --highlight: #5b4b10; --warn-tint: #33290f;
       }
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
-    body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
+    body { margin: 0; background-color: var(--ground); background-image: radial-gradient(1000px 520px at 88% -60px, color-mix(in srgb, var(--violet) 34%, transparent), transparent 70%), radial-gradient(900px 520px at 6% -100px, color-mix(in srgb, var(--accent) 38%, transparent), transparent 70%), radial-gradient(700px 400px at 50% 110%, color-mix(in srgb, var(--accent-2) 22%, transparent), transparent 70%); background-repeat: no-repeat; background-attachment: fixed; color: var(--ink); font: 16px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
     button { font: inherit; color: inherit; cursor: pointer; }
     a { color: inherit; }
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
@@ -46,31 +52,35 @@
     .app.panel-open { grid-template-columns: minmax(0, 1fr) var(--panel-w); }
     .main { display: flex; flex-direction: column; min-width: 0; height: 100dvh; }
 
-    header.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 24px; }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -0.01em; }
+    header.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 24px; backdrop-filter: blur(14px); background: color-mix(in srgb, var(--ground) 35%, transparent); position: relative; z-index: 2; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.02em; font-size: 17px; }
     .brand svg { width: 28px; height: 28px; flex: none; }
     .account { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); min-width: 0; }
     .account .who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
     .btn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 500; text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
     .btn:hover { background: var(--sunken); }
-    .btn.solid { background: var(--ink); color: var(--ground); border-color: var(--ink); }
-    .btn.solid:hover { opacity: .88; background: var(--ink); }
+    .btn.solid { background: var(--brand); color: #fff; border-color: transparent; box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--accent) 70%, transparent); }
+    .btn.solid:hover { filter: brightness(1.06); background: var(--brand); }
+    #admin-link { border-color: color-mix(in srgb, var(--violet) 40%, var(--line)); color: var(--violet); }
 
     .scroller { flex: 1; overflow-y: auto; scroll-behavior: smooth; }
     .column { width: 100%; max-width: 740px; margin: 0 auto; padding: 8px 24px 24px; }
 
     /* empty state */
     .hello { padding: 9vh 0 8px; }
-    .hello h1 { font: 500 clamp(32px, 5vw, 46px)/1.1 var(--display); letter-spacing: -0.02em; margin: 0 0 12px; }
+    .hello h1 { font: 800 clamp(34px, 5.4vw, 54px)/1.04 var(--display); letter-spacing: -0.035em; margin: 0 0 14px; background: linear-gradient(120deg, var(--ink) 30%, var(--accent) 70%, var(--violet) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .hello p { margin: 0; color: var(--muted); max-width: 46ch; font-size: 17px; }
     .suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
-    .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-size: 14.5px; }
-    .chip:hover { background: var(--sunken); }
+    .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 9px 16px; font-size: 14.5px; font-weight: 500; transition: transform .15s, border-color .15s, background .15s; }
+    /* each starter question gets its own colour dot */
+    .chip::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 9px; background: var(--dot, var(--accent)); vertical-align: 1px; }
+    .chip:nth-child(1) { --dot: #10b981; } .chip:nth-child(2) { --dot: #7c5cff; } .chip:nth-child(3) { --dot: #f59e0b; } .chip:nth-child(4) { --dot: #0ea5b7; }
+    .chip:hover { border-color: var(--accent); background: var(--accent-tint); color: var(--accent-strong); transform: translateY(-1px); }
 
     /* messages */
     .turn { margin: 22px 0; display: flex; flex-direction: column; }
     .turn.user { align-items: flex-end; }
-    .bubble { background: var(--sunken); border-radius: var(--radius); border-bottom-right-radius: 6px; padding: 10px 16px; max-width: 85%; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .bubble { background: var(--brand); color: #fff; font-weight: 500; box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--accent) 80%, transparent); border-radius: var(--radius); border-bottom-right-radius: 6px; padding: 10px 16px; max-width: 85%; white-space: pre-wrap; overflow-wrap: anywhere; }
     .answer { width: 100%; overflow-wrap: anywhere; }
     .answer p { margin: 0 0 12px; }
     .answer p:last-child { margin-bottom: 0; }
@@ -80,22 +90,23 @@
     .tablewrap { overflow-x: auto; margin: 4px 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
     .answer table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
     .answer th, .answer td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--line); }
-    .answer th { font-weight: 600; color: var(--muted); }
+    .answer th { font-weight: 700; color: var(--accent-strong); background: var(--accent-tint); }
     .answer tr:last-child td { border-bottom: 0; }
-    .note { display: inline-flex; align-items: center; gap: 8px; background: var(--warn-tint); border-radius: 999px; padding: 4px 12px 4px 10px; font-size: 13.5px; margin-bottom: 10px; }
-    .note i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .note { display: inline-flex; align-items: center; gap: 8px; background: var(--accent-tint); color: var(--accent-strong); border-radius: 999px; padding: 5px 14px 5px 11px; font-size: 13.5px; font-weight: 600; margin-bottom: 10px; }
+    .note i { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); }
     .error { color: #b3261e; }
 
     /* inline citation markers: the accent lives here */
-    .cite { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin: 0 1px 0 3px; vertical-align: 2px; border: 0; border-radius: 9px; background: var(--accent-tint); color: var(--accent); font-size: 11px; font-weight: 600; line-height: 1; }
-    .cite:hover, .cite.lit { background: var(--accent); color: var(--accent-ink); }
+    .cite { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 6px; margin: 0 1px 0 3px; vertical-align: 2px; border: 0; border-radius: 10px; background: var(--accent-tint); color: var(--accent-strong); font-size: 11px; font-weight: 700; line-height: 1; transition: transform .12s; }
+    .cite:hover, .cite.lit { background: var(--brand); color: #fff; transform: translateY(-1px); }
 
     /* the quotes an answer rests on */
     .basis { margin-top: 14px; }
-    .basis-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
-    .quote { display: block; width: 100%; text-align: left; border: 0; background: var(--surface); border-radius: 12px; padding: 10px 14px 10px 14px; margin-bottom: 6px; position: relative; border: 1px solid var(--line); }
-    .quote:hover, .quote.lit { border-color: var(--accent); }
-    .quote .qn { color: var(--accent); font-weight: 600; font-size: 12px; margin-right: 6px; }
+    .basis-label { font-size: 12.5px; font-weight: 700; color: var(--accent-strong); margin-bottom: 8px; }
+    .quote { display: block; width: 100%; text-align: left; background: var(--surface); border-radius: 14px; padding: 11px 14px 11px 17px; margin-bottom: 8px; position: relative; border: 1px solid var(--line); overflow: hidden; transition: border-color .15s, transform .15s; }
+    .quote::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--brand); }
+    .quote:hover, .quote.lit { border-color: var(--accent); transform: translateY(-1px); }
+    .quote .qn { color: var(--accent-strong); font-weight: 800; font-size: 12px; margin-right: 6px; }
     .quote .qt { color: var(--ink); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .quote .qs { display: block; font-size: 12.5px; color: var(--faint); margin-top: 4px; }
     .more { border: 0; background: none; color: var(--muted); font-size: 13.5px; padding: 4px 2px; text-decoration: underline; text-underline-offset: 3px; }
@@ -110,34 +121,35 @@
     /* ---- prompt box ---- */
     .composer { padding: 0 24px 18px; }
     .composer-inner { max-width: 740px; margin: 0 auto; }
-    .promptbox { display: flex; align-items: flex-end; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 8px 8px 8px 20px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
-    .promptbox:focus-within { border-color: var(--faint); }
+    .promptbox { display: flex; align-items: flex-end; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 8px 8px 8px 22px; box-shadow: 0 10px 30px -14px color-mix(in srgb, var(--ink) 35%, transparent); transition: box-shadow .2s, border-color .2s; }
+    .promptbox:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent), 0 10px 30px -14px color-mix(in srgb, var(--accent) 60%, transparent); }
     .promptbox textarea { flex: 1; border: 0; outline: 0; background: transparent; resize: none; font: inherit; color: var(--ink); padding: 8px 0; max-height: 180px; line-height: 1.5; }
     .promptbox textarea::placeholder { color: var(--faint); }
-    .send { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
-    .send:disabled { background: var(--sunken); color: var(--faint); cursor: default; }
+    .send { flex: none; width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--brand); color: #fff; display: grid; place-items: center; box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--accent) 75%, transparent); transition: transform .12s, filter .12s; }
+    .send:hover:not(:disabled) { transform: scale(1.06); filter: brightness(1.05); }
+    .send:disabled { background: var(--sunken); color: var(--faint); box-shadow: none; cursor: default; }
     .send svg { width: 18px; height: 18px; }
     .fine { text-align: center; font-size: 12.5px; color: var(--faint); margin: 10px 0 0; }
 
     /* ---- sources panel ---- */
     .panel { overflow: hidden; background: var(--surface); border-left: 1px solid var(--line); min-width: 0; }
     .panel-inner { width: var(--panel-w); height: 100dvh; display: flex; flex-direction: column; }
-    .panel header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); font-weight: 600; }
+    .panel header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); font-weight: 800; letter-spacing: -0.01em; }
     .iconbtn { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; font-size: 20px; line-height: 1; color: var(--muted); }
     .iconbtn:hover { background: var(--sunken); }
     .panel-body { flex: 1; overflow-y: auto; padding: 16px 20px 28px; }
     .src { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; scroll-margin-top: 12px; }
-    .src.lit { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+    .src.lit { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
     .src h3 { margin: 0 0 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-    .src h3 .n { background: var(--accent-tint); color: var(--accent); border-radius: 9px; font-size: 11px; padding: 1px 7px; }
+    .src h3 .n { background: var(--brand); color: #fff; border-radius: 10px; font-size: 11px; font-weight: 700; padding: 2px 8px; }
     .src .passage { font-size: 14px; color: var(--muted); white-space: pre-wrap; margin: 0; overflow-wrap: anywhere; }
-    .src mark { background: var(--highlight); color: var(--ink); border-radius: 3px; padding: 1px 0; }
+    .src mark { background: var(--highlight); color: var(--ink); border-radius: 4px; padding: 2px 2px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
     .src .where { font-size: 12.5px; color: var(--faint); margin-top: 8px; }
 
     /* ---- sign-in dialog ---- */
     dialog { border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--ink); padding: 24px; width: min(380px, calc(100vw - 32px)); }
-    dialog::backdrop { background: rgba(0,0,0,.35); }
-    dialog h2 { font: 500 24px/1.2 var(--display); margin: 0 0 4px; }
+    dialog::backdrop { background: rgba(8,12,22,.55); backdrop-filter: blur(4px); }
+    dialog h2 { font: 800 26px/1.15 var(--display); letter-spacing: -0.03em; margin: 0 0 4px; }
     dialog p.sub { margin: 0 0 16px; color: var(--muted); font-size: 14.5px; }
     dialog label { display: block; font-size: 13.5px; font-weight: 500; margin: 12px 0 4px; }
     dialog input { width: 100%; border: 1px solid var(--line); background: var(--ground); color: var(--ink); border-radius: 12px; padding: 10px 12px; font: inherit; }
@@ -165,7 +177,7 @@
     <div class="main">
       <header class="bar">
         <div class="brand">
-          <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="var(--accent)"/><path d="M16 5 L23.5 20 H8.5 Z" fill="var(--accent-ink)"/><circle cx="16" cy="23" r="3.4" fill="var(--accent-ink)"/></svg>
+          <svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#0ea5b7"/></linearGradient></defs><rect width="32" height="32" rx="10" fill="url(#bg)"/><path d="M16 6 L23 20 H9 Z" fill="#fff"/><circle cx="16" cy="23.2" r="3.2" fill="#fff" fill-opacity=".92"/></svg>
           GnomeGuard Help
         </div>
         <div class="account">
@@ -192,7 +204,7 @@
       <div class="composer">
         <form class="composer-inner" id="chat-form" autocomplete="off">
           <div class="promptbox">
-            <textarea id="input" rows="1" placeholder="Ask about coverage, plans or claims" aria-label="Your message"></textarea>
+            <textarea id="input" rows="1" placeholder="Ask about coverage or claims" aria-label="Your message"></textarea>
             <button type="submit" class="send" id="send" aria-label="Send" disabled>
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg>
             </button>

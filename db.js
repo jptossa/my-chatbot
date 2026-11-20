@@ -33,14 +33,39 @@ if (USE_PG) {
     max: Number(process.env.PG_POOL_MAX) || 3, // each serverless instance is small
     idleTimeoutMillis: 10_000,
     connectionTimeoutMillis: 8_000,
+    keepAlive: true,
   });
   pool.on("error", (error) => console.error("Idle database connection error:", error.message));
 
+  // A serverless instance is frozen between requests, so a pooled connection can be dead
+  // (closed by Supabase's pooler) by the time it is reused. That surfaces as "Connection
+  // terminated". The dead client is discarded, so trying once more gets a fresh one.
+  const isDroppedConnection = (error) =>
+    /connection terminated|ECONNRESET|EPIPE|timeout exceeded when trying to connect|server closed the connection/i.test(error?.message || "");
+  const withRetry = async (fn) => {
+    try {
+      return await fn();
+    } catch (error) {
+      if (!isDroppedConnection(error)) throw error;
+      console.error("Database connection dropped, retrying once:", error.message);
+      return fn();
+    }
+  };
+
   backend = {
     kind: "postgres",
-    query: (text, params) => pool.query(text, params),
+    query: (text, params) => withRetry(() => pool.query(text, params)),
     async transaction(fn) {
-      const client = await pool.connect();
+      const client = await withRetry(async () => {
+        const c = await pool.connect();
+        try {
+          await c.query("SELECT 1"); // fail here, not halfway through the transaction
+          return c;
+        } catch (error) {
+          c.release(error); // destroy the dead client rather than return it to the pool
+          throw error;
+        }
+      });
       try {
         await client.query("BEGIN");
         const result = await fn({ query: (text, params) => client.query(text, params), exec: (text) => client.query(text) });
@@ -200,12 +225,24 @@ async function migrate() {
   });
 }
 
-const ready = migrate();
-ready.catch(() => {}); // the real error surfaces on the first query that awaits `ready`
+// A failed attempt is forgotten, so the next query tries again instead of every request
+// on a warm instance failing with the first error until the instance is recycled.
+let readyPromise = null;
+function ensureReady() {
+  if (!readyPromise) {
+    readyPromise = migrate().catch((error) => {
+      readyPromise = null;
+      throw error;
+    });
+  }
+  return readyPromise;
+}
+const ready = ensureReady();
+ready.catch(() => {}); // the real error surfaces on the first query that awaits it
 
 /** Runs a query; resolves to the array of rows. */
 async function query(text, params = []) {
-  await ready;
+  await ensureReady();
   return (await backend.query(text, params)).rows;
 }
 /** Like query(), but resolves to the first row (or undefined). */
@@ -214,7 +251,7 @@ async function queryOne(text, params = []) {
 }
 /** Runs fn({ query, queryOne }) in a transaction; commits if it resolves, rolls back if it throws. */
 async function transaction(fn) {
-  await ready;
+  await ensureReady();
   return backend.transaction(async (tx) => {
     const q = async (text, params = []) => (await tx.query(text, params)).rows;
     return fn({ query: q, queryOne: async (text, params = []) => (await q(text, params))[0] });

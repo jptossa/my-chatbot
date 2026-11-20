@@ -1,0 +1,197 @@
+{
+  "run": "eval-set-run",
+  "set": "eval-set.json",
+  "set_version": 1,
+  "runs_per_case": 1,
+  "judge": "claude-sonnet-5-5",
+  "started": "2026-11-20T19:11:58.115Z",
+  "finished": null,
+  "partial": true,
+  "selected": 68,
+  "results": [
+    {
+      "id": "ans-01",
+      "category": "answerable",
+      "layer": null,
+      "intent": null,
+      "style": null,
+      "critical": false,
+      "origin": null,
+      "known_risk": null,
+      "rationale": "Premium Tiers table: Basic monthly premium $7.99.",
+      "expected": {
+        "outcome": "answer",
+        "must_include": [
+          [
+            "7.99"
+          ]
+        ],
+        "sources_include": [
+          "tiers"
+        ]
+      },
+      "flow_checks": null,
+      "verdict": "PASS",
+      "pass_count": "1/1",
+      "runs": [
+        {
+          "verdict": "PASS",
+          "reasons": [],
+          "attempts": 1,
+          "infrastructure_problem": null,
+          "judge_skipped": false,
+          "judge": [],
+          "entries": [
+            {
+              "role": "scored",
+              "say": "How much does the Basic tier cost per month?",
+              "status": 200,
+              "ms": 3118,
+              "reply": "According to the Premium Tiers document, the Basic tier costs **$7.99 per month**. Policies are billed monthly by default, and paying annually applies a 10% discount (for Basic, that's $86.29 per year).",
+              "sources": [
+                "GnomeGuard Insurance — Premium Tiers"
+              ],
+              "escalated": false,
+              "trigger": null,
+              "outOfScope": false,
+              "model": "claude-sonnet-5-5",
+              "error": null,
+              "rowsCreated": 0,
+              "newRowTriggers": [],
+              "scopeCheckFailed": false
+            }
+          ],
+          "accepted_as": [
+            "answer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ans-02",
+      "category": "answerable",
+      "layer": null,
+      "intent": null,
+      "style": null,
+      "critical": false,
+      "origin": null,
+      "known_risk": null,
+      "rationale": "Premium Tiers table: Premier annual premium $269.89 (10% discount applied).",
+      "expected": {
+        "outcome": "answer",
+        "must_include": [
+          [
+            "269.89"
+          ]
+        ],
+        "sources_include": [
+          "tiers"
+        ]
+      },
+      "flow_checks": null,
+      "verdict": "PASS",
+      "pass_count": "1/1",
+      "runs": [
+        {
+          "verdict": "PASS",
+          "reasons": [],
+          "attempts": 1,
+          "infrastructure_problem": null,
+          "judge_skipped": false,
+          "judge": [],
+          "entries": [
+            {
+              "role": "scored",
+              "say": "What is the annual price of the Premier tier?",
+              "status": 200,
+              "ms": 3506,
+              "reply": "According to the Premium Tiers document, the annual premium for the Premier tier is **$269.89**. This already includes the 10% discount that applies when you pay annually instead of monthly.\n\nFor comparison, Premier's monthly premium is $24.99. Policies are billed monthly by default, so you would need to choose annual billing to get the discount.",
+              "sources": [
+                "GnomeGuard Insurance — Premium Tiers"
+              ],
+              "escalated": false,
+              "trigger": null,
+              "outOfScope": false,
+              "model": "claude-sonnet-5-5",
+              "error": null,
+              "rowsCreated": 0,
+              "newRowTriggers": [],
+              "scopeCheckFailed": false
+            }
+          ],
+          "accepted_as": [
+            "answer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ans-03",
+      "category": "answerable",
+      "layer": null,
+      "intent": null,
+      "style": null,
+      "critical": false,
+      "origin": null,
+      "known_risk": null,
+      "rationale": "Plus and Premier cover it; Basic does not (Coverage Guide, Premium Tiers, Exclusions).",
+      "expected": {
+        "outcome": "answer",
+        "must_include": [
+          [
+            "Plus"
+          ],
+          [
+            "Premier"
+          ],
+          [
+            "Basic"
+          ]
+        ],
+        "sources_include": [
+          "coverage",
+          "tiers",
+          "exclusions"
+        ]
+      },
+      "flow_checks": null,
+      "verdict": "PASS",
+      "pass_count": "1/1",
+      "runs": [
+        {
+          "verdict": "PASS",
+          "reasons": [],
+          "attempts": 1,
+          "infrastructure_problem": null,
+          "judge_skipped": false,
+          "judge": [],
+          "entries": [
+            {
+              "role": "scored",
+              "say": "Which tiers cover accidental breakage?",
+              "status": 200,
+              "ms": 4097,
+              "reply": "According to the Coverage Guide, accidental breakage is covered under the **Plus** and **Premier** tiers. The Basic tier does not include it.\n\nAccidental breakage means damage to an Insured Gnome caused by the policyholder's own household activity, such as a dropped garden tool, a stray soccer ball, or a fallen tree branch during normal weather. A Basic policyholder whose gnome is broken by a dropped rake would need to self-fund the repair or replacement.\n\nTwo things to keep in mind from the Exclusions & Definitions document:\n- Damage from your own mower, trimmer, or other yard equipment is excluded at every tier, even on Plus or Premier.\n- Pre-existing damage (damage that existed before the gnome was added to your policy) is not covered.\n\nThe Premium Tiers document lists the deductibles and coverage limits for the two tiers that include breakage coverage:\n- **Plus:** $25 deductible per claim, $750 coverage limit per gnome\n- **Premier:** $10 deductible per claim, $1,500 coverage limit per gnome",
+              "sources": [
+                "GnomeGuard Insurance — Exclusions & Definitions",
+                "GnomeGuard Insurance — Coverage Guide",
+                "GnomeGuard Insurance — Premium Tiers"
+              ],
+              "escalated": false,
+              "trigger": null,
+              "outOfScope": false,
+              "model": "claude-sonnet-5-5",
+              "error": null,
+              "rowsCreated": 0,
+              "newRowTriggers": [],
+              "scopeCheckFailed": false
+            }
+          ],
+          "accepted_as": [
+            "answer"
+          ]
+        }
+      ]
+    }
+  ]
+}

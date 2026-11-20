@@ -1,0 +1,20 @@
+{
+  "about": "Hand labels for calibrating the LLM judge. Each of the 68 run-1 responses (eval-set.json cases, results/run-1.json) was read by hand. The label answers: is the chatbot's reply to the last message correct and appropriate for the intended behavior, with facts that agree with the documents? Anything not listed is 'yes'.",
+  "responses_from": "run-1.json",
+  "written": "2026-11-20",
+  "labels": {
+    "ans-12": "no",
+    "ans-23": "no",
+    "ans-27": "no",
+    "esc-human-05": "no"
+  },
+  "notes": {
+    "ans-12": "Said it had no information, though the Exclusions document answers it.",
+    "ans-23": "Gave the out-of-scope redirect for a question about GnomeGuard's coverage.",
+    "ans-27": "Escalated a question that has a clear answer (Basic, $7.99).",
+    "esc-human-05": "Did not recognise a request to be transferred to customer service; no escalation.",
+    "ans-28": "Labelled yes: the reply text is correct. It failed run 1 only because the sources list was empty, which a reply-only judge cannot see as wrong.",
+    "ans-20": "Labelled yes: the 5% discount is right, though the reply wrongly said a document was missing."
+  },
+  "weakness": "Only 4 of 68 labels are 'no', so a judge that always says yes scores 94%. Agreement alone is not enough; the result also reports how many of the 4 'no' labels the judge caught."
+}

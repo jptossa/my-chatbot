@@ -1,0 +1,425 @@
+{
+  "judge_model": "claude-sonnet-5-5",
+  "agreement": "67/68 (98.5%)",
+  "required": "95%",
+  "meets_requirement": true,
+  "labelled_no_caught": "4/4",
+  "disagreements": [
+    {
+      "id": "ans-24",
+      "labelled": "yes",
+      "judge": "NO",
+      "reason": "The Premium Tiers doc says Premier turnaround is 3 business days, but the Claims FAQ says weather and water claims always go through adjuster review, which can extend beyond those windows. The reply p"
+    }
+  ],
+  "detail": [
+    {
+      "id": "ans-01",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply states Basic is $7.99/month, matching the Premium Tiers table, and correctly adds the $86.29 annual price. It cites the right source and needed no escalation."
+    },
+    {
+      "id": "ans-02",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply states Premier annual is $269.89 with the 10% discount applied, and $24.99 monthly, both matching the Premium Tiers table; no escalation was needed."
+    },
+    {
+      "id": "ans-03",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly says Plus and Premier cover accidental breakage and Basic does not, with details matching the Coverage Guide and Exclusions documents, and no escalation was needed."
+    },
+    {
+      "id": "ans-04",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly says Plus excludes weather/water damage and only Premier covers it, with adjuster review noted. Premier prices ($24.99 monthly, $269.89 annual) match the documents, and no escalati"
+    },
+    {
+      "id": "ans-05",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply says a police report is required only for theft, with photos sufficing for vandalism and breakage. Filing details and the 5-day window match the documents."
+    },
+    {
+      "id": "ans-06",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly states the 5-day reporting window and the reasonable-cause exception, matching the Claims FAQ. The added filing details also agree with the documents."
+    },
+    {
+      "id": "ans-07",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply states Premier is expedited at 3 business days versus 10 standard, matching the documents, and correctly notes the weather/water adjuster-review caveat."
+    },
+    {
+      "id": "ans-08",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply gives $250 via the $300 Basic cap minus the $50 deductible, matching the documented worked example. The police report requirement and the $575 Plus comparison also agree with the documents."
+    },
+    {
+      "id": "ans-09",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly applies the $750 Plus limit and $25 deductible for $725, avoids the $975 error, and accurately notes the police report requirement and Premier tier details."
+    },
+    {
+      "id": "ans-10",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply gives $1,490, correctly capping at the $1,500 Premier limit and subtracting the $10 deductible. The police report and 3-day turnaround facts match the documents."
+    },
+    {
+      "id": "ans-11",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly says flamingos can't be insured, and its details (the garden gnome definition, \"any tier,\" and \"under any circumstance\") match the Exclusions & Definitions and Coverage Guide docum"
+    },
+    {
+      "id": "ans-12",
+      "labelled": "no",
+      "judge": "NO",
+      "reason": "The documents clearly state that a gnome temporarily moved off the Garden Location, such as to a friend's yard or garden show, isn't covered. The chatbot claimed no information existed, never gave tha"
+    },
+    {
+      "id": "ans-13",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly states own-mower damage is excluded at every tier, citing both documents accurately, including the neighbor's-mower distinction, with no unsupported claims."
+    },
+    {
+      "id": "ans-14",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly says neighbor's mower damage is covered as accidental breakage on Plus, distinguishes the policyholder's own equipment exclusion, and accurately cites partial-damage reimbursement "
+    },
+    {
+      "id": "ans-15",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply says one claim, one deductible, each gnome evaluated individually against its own per-gnome limit, all matching the Claims FAQ. The police report and limit-definition details also agree with"
+    },
+    {
+      "id": "ans-16",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply states the 30-day Garden Location update requirement and denial consequence, matching the Claims FAQ and Exclusions documents, and honestly notes the missing how-to details."
+    },
+    {
+      "id": "ans-17",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply states one claim doesn't automatically raise premium, two or more may, with 30 days' written notice. The multi-gnome one-claim addition is accurate and sourced."
+    },
+    {
+      "id": "ans-18",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply answers directly, stating one change per 12-month period with no fee and no refund on a downgrade. It matches the Premium Tiers document, and its timing suggestion is reasonable."
+    },
+    {
+      "id": "ans-19",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply states Plus covers at most 5 gnomes and offers both intended options (upgrade to Premier or buy a second policy). All prices, limits, and deductibles match the documents, the monthly compari"
+    },
+    {
+      "id": "ans-20",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly states the 5% discount on second and later policies for two or more garden locations, matching the documents. The claim that it lacks the Exclusions document is odd but harmless, a"
+    },
+    {
+      "id": "ans-21",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly says pre-existing damage isn't covered, that claiming it is a false claim risking policy cancellation, and cites both documents accurately."
+    },
+    {
+      "id": "ans-22",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly states the 6-inch minimum from the Exclusions & Definitions document, notes ceramic is an eligible material, and concludes a 4-inch gnome doesn't qualify, matching the intended ans"
+    },
+    {
+      "id": "ans-23",
+      "labelled": "no",
+      "judge": "NO",
+      "reason": "The question concerns GnomeGuard coverage, so it should be answered by stating that only garden gnomes are insured. The chatbot instead called it out of scope and redirected without answering."
+    },
+    {
+      "id": "ans-24",
+      "labelled": "yes",
+      "judge": "NO",
+      "reason": "The Premium Tiers doc says Premier turnaround is 3 business days, but the Claims FAQ says weather and water claims always go through adjuster review, which can extend beyond those windows. The reply p"
+    },
+    {
+      "id": "ans-25",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply gives the portal/claims line filing methods and all required information, matching the Claims FAQ. The extra 5-day deadline and police-report details also agree with the documents."
+    },
+    {
+      "id": "ans-26",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply states the repair-cost basis, per-gnome limit, deductible, and total-loss fallback accurately. Added caveats on tier, pre-existing damage, and location also match the documents."
+    },
+    {
+      "id": "ans-27",
+      "labelled": "no",
+      "judge": "NO",
+      "reason": "The intended behavior was to answer that Basic at $7.99/month is cheapest. The chatbot instead escalated without giving any answer, even though the documents clearly contain it."
+    },
+    {
+      "id": "ans-28",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply answers directly that transit/shipping damage is excluded unless separately insured, matching both documents. Its statement that tier upgrades don't help is consistent with the \"never covere"
+    },
+    {
+      "id": "ans-29",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly says photos are required, no police report is needed, and filing one is encouraged above $100 damage. Filing steps and required info match the Claims FAQ."
+    },
+    {
+      "id": "ans-30",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply states the Plus deductible is $25 per claim, matching the Premium Tiers document. Its $600 theft example ($575 payout, under the $750 limit) also agrees with the documents."
+    },
+    {
+      "id": "fu-01",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply states the Plus annual premium as $161.89 with the 10% discount versus $14.99 monthly, matching the Premium Tiers document, and answers the follow-up directly."
+    },
+    {
+      "id": "fu-02",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply answers directly, listing policy number, discovery date, police report number, and description, and correctly notes the 5-day reporting window, all matching the Claims FAQ."
+    },
+    {
+      "id": "fu-03",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply correctly states the Premier deductible is $10 and gives a $590 payout example. Its other details (limit, premium, turnaround, adjuster review) all match the documents."
+    },
+    {
+      "id": "oos-01",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot declined the unrelated France question, redirected to GnomeGuard topics, stated no facts conflicting with the documents, and created no escalation."
+    },
+    {
+      "id": "oos-02",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot declined the poem request as out of scope, redirected to GnomeGuard topics, and made no claims contradicting the documents."
+    },
+    {
+      "id": "oos-03",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot declined the coding request, stayed in scope, and redirected to GnomeGuard topics (coverage, tiers, claims) without stating anything inconsistent with the documents."
+    },
+    {
+      "id": "oos-04",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The bot declined the prompt-injection attempt without revealing instructions, redirected to GnomeGuard topics accurately (tiers named correctly), and made no factual errors."
+    },
+    {
+      "id": "oos-05",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot politely declined the pizza question, redirected to GnomeGuard topics (coverage, tiers, claims), and made no factual claims contradicting the documents."
+    },
+    {
+      "id": "oos-06",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot declined to give medical advice, redirected to GnomeGuard topics, and stated no facts contradicting the documents."
+    },
+    {
+      "id": "oos-07",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot declined the Geico car insurance question as out of scope, redirected to GnomeGuard topics, and stated nothing that contradicts the documents."
+    },
+    {
+      "id": "oos-08",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The customer asked about tomorrow's weather, which is unrelated to insurance. The chatbot politely declined, redirected to relevant topics, and made no claims that contradict the documents."
+    },
+    {
+      "id": "oos-09",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot declined the pirate-joke request as out of scope, redirected to GnomeGuard topics, and stated nothing contradicting the documents."
+    },
+    {
+      "id": "oos-10",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot declined the off-topic trivia question, redirected to GnomeGuard topics, and stated nothing that contradicts the documents."
+    },
+    {
+      "id": "oos-11",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot declined the legal question about a lawn chair, gave no legal advice, and redirected to GnomeGuard topics that match the documents."
+    },
+    {
+      "id": "oos-12",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot politely declined the off-topic translation request, redirected to insurance topics, and stated no facts contradicting the documents."
+    },
+    {
+      "id": "oos-13",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot declined the off-topic gnome history question, redirected to GnomeGuard topics, and stated no facts contradicting the documents."
+    },
+    {
+      "id": "chat-01",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply is a friendly greeting with an accurate overview of what the bot helps with (coverage, tiers, claims), no refusal or escalation, and the harness shows zero escalation rows."
+    },
+    {
+      "id": "chat-02",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply politely closes the conversation with no lookup, makes no incorrect claims, and no escalation was created, matching the intended \"chat\" behavior."
+    },
+    {
+      "id": "esc-human-01",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The customer explicitly asked for a person; the chatbot flagged the conversation, and the system recorded a human_requested escalation. No facts contradict the documents."
+    },
+    {
+      "id": "esc-human-02",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The customer explicitly asked for a human, and the chatbot escalated with the human_requested trigger recorded and one escalation row created. It stated no facts contradicting the documents."
+    },
+    {
+      "id": "esc-human-03",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The customer explicitly asked for a supervisor; the chatbot flagged the conversation for follow-up, and the harness recorded the escalation with trigger human_requested. No facts contradict the docume"
+    },
+    {
+      "id": "esc-human-04",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot honored the explicit human request by escalating; the system log confirms an escalation with trigger human_requested, and the reply makes no claims that contradict the documents."
+    },
+    {
+      "id": "esc-human-05",
+      "labelled": "no",
+      "judge": "NO",
+      "reason": "The customer clearly asked to be handed to staff, but the chatbot refused the transfer and recorded no escalation (new escalation rows: 0). It gave claims-filing info instead of escalating."
+    },
+    {
+      "id": "esc-gap-01",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The documents mention a claims line but give no number, so escalating as a known gap is correct. The reply invented no facts, and the harness recorded the escalation."
+    },
+    {
+      "id": "esc-gap-02",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The documents contain no office hours, and the chatbot escalated with a known_gap trigger, recording one escalation row, matching the intended behavior without inventing facts."
+    },
+    {
+      "id": "esc-gap-03",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The documents contain no dispute or appeal process. The chatbot escalated with a known_gap trigger, recorded one escalation, and invented no unsupported facts."
+    },
+    {
+      "id": "esc-gap-04",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "Documents don't explain customer-initiated cancellation. The chatbot escalated with a recorded known_gap trigger, invented no facts, and its reply is appropriate."
+    },
+    {
+      "id": "esc-gap-05",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The documents never mention payment methods, so escalating as a known gap is correct. The reply invents no facts, and the harness confirms one escalation was recorded."
+    },
+    {
+      "id": "esc-gap-06",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The documents list no claims email address, so escalating as a known gap is correct, and the system log confirms one escalation was recorded. The reply invents no facts."
+    },
+    {
+      "id": "esc-rep-01",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The customer repeated the Plus-tier price question in different words, and the chatbot escalated, with the harness recording one escalation row triggered by repeated_question. The reply states no fact"
+    },
+    {
+      "id": "esc-rep-02",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The last message repeats the first question reworded, and the chatbot escalated with a handoff message. The harness logged one escalation row with trigger repeated_question, and the reply states no fa"
+    },
+    {
+      "id": "gap-01",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The bot says it has no student discount information and invents none. The annual 10% and multi-policy 5% discounts, and the $7.99 to $86.29 Basic figures, match the documents."
+    },
+    {
+      "id": "gap-02",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot stated it lacked information about a free gnome hat, correctly noting no documents mention perks, and offered relevant help without fabricating anything."
+    },
+    {
+      "id": "gap-03",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The founder question isn't covered in the documents; the chatbot correctly said it lacked that information, invented nothing, and offered relevant topics it can help with."
+    },
+    {
+      "id": "gap-04",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply says the documents lack country information, accurately cites the Garden Location definition and off-property exclusion, invents no coverage claims, and refers the customer to GnomeGuard dir"
+    },
+    {
+      "id": "gap-05",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot said it lacks approval-rate information, matching the intended no_info behavior, and its added claim-type details accurately match the documents."
+    },
+    {
+      "id": "ctl-01",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The reply answers the Premier monthly price ($24.99) directly. The annual total ($269.89), deductible, limit, unlimited gnomes, coverage types, and 3-day turnaround all match the documents. The adjust"
+    },
+    {
+      "id": "ctl-02",
+      "labelled": "yes",
+      "judge": "YES",
+      "reason": "The chatbot answered directly, saying adjusters review weather claims, did not escalate (0 escalation rows), and all stated facts match the documents."
+    }
+  ]
+}

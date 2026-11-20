@@ -1,0 +1,8 @@
+.env
+.env.*
+chat.db*
+data/
+legacy-sqlite/
+eval/
+gnomeguard-insurance-starter-kit.zip
+*.log

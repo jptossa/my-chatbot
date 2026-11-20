@@ -1,0 +1,289 @@
+{
+  "run": "smoke-pg",
+  "set": "eval-set-v2.json",
+  "set_version": 2,
+  "runs_per_case": 1,
+  "judge": "claude-sonnet-5-5",
+  "started": "2026-11-20T18:09:54.828Z",
+  "finished": "2026-11-20T18:09:57.815Z",
+  "partial": false,
+  "selected": 5,
+  "results": [
+    {
+      "id": "esc-human-01",
+      "category": "escalation_human_requested",
+      "layer": "baseline",
+      "intent": "human_request",
+      "style": null,
+      "critical": true,
+      "origin": "v1",
+      "known_risk": null,
+      "rationale": "Explicit request for a human.",
+      "expected": {
+        "outcome": "escalate",
+        "trigger": "human_requested"
+      },
+      "flow_checks": null,
+      "verdict": "PASS",
+      "pass_count": "1/1",
+      "runs": [
+        {
+          "verdict": "PASS",
+          "reasons": [],
+          "attempts": 1,
+          "infrastructure_problem": null,
+          "judge_skipped": false,
+          "judge": [],
+          "entries": [
+            {
+              "role": "scored",
+              "say": "Can I talk to a person?",
+              "status": 200,
+              "ms": 106,
+              "reply": "This looks like something a member of our team should help with. I've flagged this conversation, and someone will follow up soon.",
+              "sources": [],
+              "escalated": true,
+              "trigger": "human_requested",
+              "outOfScope": false,
+              "error": null,
+              "rowsCreated": 1,
+              "newRowTriggers": [
+                "human_requested"
+              ],
+              "scopeCheckFailed": false
+            }
+          ],
+          "accepted_as": [
+            "escalate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chaos-01",
+      "category": "edge_case",
+      "layer": "chaos",
+      "intent": null,
+      "style": null,
+      "critical": false,
+      "origin": "v2",
+      "known_risk": null,
+      "rationale": "Gibberish: ask what they mean (the out-of-scope redirect, which lists what the bot can help with, is also fine).",
+      "expected": {
+        "outcome": "clarify",
+        "also_acceptable": [
+          "out_of_scope"
+        ]
+      },
+      "flow_checks": null,
+      "verdict": "PASS",
+      "pass_count": "1/1",
+      "runs": [
+        {
+          "verdict": "PASS",
+          "reasons": [],
+          "attempts": 1,
+          "infrastructure_problem": null,
+          "judge_skipped": false,
+          "judge": [],
+          "entries": [
+            {
+              "role": "scored",
+              "say": "asdkjh qwpoeiru zxcmn lkjqw",
+              "status": 200,
+              "ms": 608,
+              "reply": "Sorry, that one's outside what I can help with! I'm here for GnomeGuard Insurance, so I'd be glad to help with what your policy covers, how the Basic, Plus and Premier plans compare, or how to file a claim. What would you like to know?",
+              "sources": [],
+              "escalated": false,
+              "trigger": null,
+              "outOfScope": true,
+              "error": null,
+              "rowsCreated": 0,
+              "newRowTriggers": [],
+              "scopeCheckFailed": false
+            }
+          ],
+          "accepted_as": [
+            "out_of_scope"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chaos-04",
+      "category": "edge_case",
+      "layer": "chaos",
+      "intent": null,
+      "style": null,
+      "critical": false,
+      "origin": "v2",
+      "known_risk": null,
+      "rationale": "Empty message: the server must reject it with an error asking for text, store nothing and not crash.",
+      "expected": {
+        "outcome": "rejected"
+      },
+      "flow_checks": null,
+      "verdict": "PASS",
+      "pass_count": "1/1",
+      "runs": [
+        {
+          "verdict": "PASS",
+          "reasons": [],
+          "attempts": 1,
+          "infrastructure_problem": null,
+          "judge_skipped": false,
+          "judge": [],
+          "entries": [
+            {
+              "role": "scored",
+              "say": "",
+              "status": 400,
+              "ms": 14,
+              "reply": null,
+              "sources": null,
+              "escalated": false,
+              "trigger": null,
+              "outOfScope": false,
+              "error": "Request body must include a non-empty 'message' string.",
+              "rowsCreated": 0,
+              "newRowTriggers": [],
+              "scopeCheckFailed": false
+            }
+          ],
+          "accepted_as": [
+            "rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chaos-06",
+      "category": "edge_case",
+      "layer": "chaos",
+      "intent": null,
+      "style": null,
+      "critical": false,
+      "origin": "v2",
+      "known_risk": null,
+      "rationale": "A non-string message must be rejected cleanly (HTTP 400), not crash the server.",
+      "expected": {
+        "outcome": "rejected"
+      },
+      "flow_checks": null,
+      "verdict": "PASS",
+      "pass_count": "1/1",
+      "runs": [
+        {
+          "verdict": "PASS",
+          "reasons": [],
+          "attempts": 1,
+          "infrastructure_problem": null,
+          "judge_skipped": false,
+          "judge": [],
+          "entries": [
+            {
+              "role": "scored",
+              "say": 12345,
+              "status": 400,
+              "ms": 12,
+              "reply": null,
+              "sources": null,
+              "escalated": false,
+              "trigger": null,
+              "outOfScope": false,
+              "error": "Request body must include a non-empty 'message' string.",
+              "rowsCreated": 0,
+              "newRowTriggers": [],
+              "scopeCheckFailed": false
+            }
+          ],
+          "accepted_as": [
+            "rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "flow-07",
+      "category": "conversation_flow",
+      "layer": "flow",
+      "intent": null,
+      "style": null,
+      "critical": true,
+      "origin": "v2",
+      "known_risk": null,
+      "rationale": "Asking for a human twice must not pile up tickets or emails: the second request gets the same acknowledgment but creates no new row.",
+      "expected": [
+        {
+          "outcome": "escalate",
+          "trigger": "human_requested"
+        },
+        {
+          "outcome": "escalate",
+          "trigger": "human_requested",
+          "escalation_rows_created": 0
+        }
+      ],
+      "flow_checks": [
+        "Is there exactly one pending escalation row for this conversation after both turns?"
+      ],
+      "verdict": "PASS",
+      "pass_count": "1/1",
+      "runs": [
+        {
+          "verdict": "PASS",
+          "reasons": [],
+          "attempts": 1,
+          "infrastructure_problem": null,
+          "judge_skipped": false,
+          "judge": [
+            {
+              "scope": "whole conversation",
+              "question": "Is there exactly one pending escalation row for this conversation after both turns?",
+              "answer": "YES",
+              "reason": "The first turn added one escalation row and the second added zero, so exactly one row exists for the conversation."
+            }
+          ],
+          "entries": [
+            {
+              "role": "scored",
+              "say": "Can I talk to a person?",
+              "status": 200,
+              "ms": 19,
+              "reply": "This looks like something a member of our team should help with. I've flagged this conversation, and someone will follow up soon.",
+              "sources": [],
+              "escalated": true,
+              "trigger": "human_requested",
+              "outOfScope": false,
+              "error": null,
+              "rowsCreated": 1,
+              "newRowTriggers": [
+                "human_requested"
+              ],
+              "scopeCheckFailed": false
+            },
+            {
+              "role": "scored",
+              "say": "Hello? I said I want a human.",
+              "status": 200,
+              "ms": 20,
+              "reply": "This looks like something a member of our team should help with. I've flagged this conversation, and someone will follow up soon.",
+              "sources": [],
+              "escalated": true,
+              "trigger": "human_requested",
+              "outOfScope": false,
+              "error": null,
+              "rowsCreated": 0,
+              "newRowTriggers": [],
+              "scopeCheckFailed": false
+            }
+          ],
+          "accepted_as": [
+            "escalate",
+            "escalate"
+          ]
+        }
+      ]
+    }
+  ]
+}

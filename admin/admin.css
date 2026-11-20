@@ -1,0 +1,83 @@
+:root {
+  --bg: #f6f7f9; --panel: #fff; --text: #1d2330; --muted: #657084; --line: #dfe3ea;
+  --accent: #2b5fd9; --flag-bg: #fff6df; --flag-line: #e3b341;
+  --user-bg: #eaf0fe; --bot-bg: #f1f2f4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171d; --panel: #1c2028; --text: #e6e9ef; --muted: #98a1b3; --line: #2d3340;
+    --accent: #7ea3ff; --flag-bg: #3a3118; --flag-line: #b58a1b;
+    --user-bg: #22304f; --bot-bg: #262b35;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+header.top {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 12px 20px; background: var(--panel); border-bottom: 1px solid var(--line);
+}
+header.top h1 { font-size: 16px; margin: 0; }
+header.top .who { color: var(--muted); font-size: 13px; }
+main { max-width: 960px; margin: 0 auto; padding: 20px 16px 48px; }
+a { color: var(--accent); }
+button {
+  font: inherit; padding: 5px 12px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--panel); color: var(--text); cursor: pointer;
+}
+input {
+  font: inherit; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--panel); color: var(--text); width: 100%;
+}
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+.muted { color: var(--muted); }
+.error { color: #c0392b; }
+.small { font-size: 13px; }
+
+/* queue */
+.queue-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.queue-head h2 { margin: 0; font-size: 20px; }
+table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--bg); }
+.scroll { overflow-x: auto; border-radius: 10px; }
+.scroll table { min-width: 620px; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 99px; font-size: 12px; background: var(--bot-bg); white-space: nowrap; }
+.empty { padding: 28px; text-align: center; }
+
+.tag.status-in_progress { background: var(--flag-bg); }
+.tag.status-resolved { background: var(--user-bg); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button:disabled { opacity: .6; cursor: default; }
+textarea {
+  font: inherit; width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--panel); color: var(--text); resize: vertical;
+}
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.tabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* detail */
+.actions-card { margin-top: 12px; }
+.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.resolve-form { margin-top: 12px; }
+.resolve-form[hidden] { display: none; }
+.resolve-form label { display: block; margin-bottom: 4px; }
+.resolve-form .actions { margin-top: 8px; }
+.note { white-space: pre-wrap; overflow-wrap: anywhere; }
+.back { display: inline-block; margin-bottom: 12px; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+h3 { margin: 24px 0 10px; font-size: 16px; }
+.msg { max-width: 80%; margin: 8px 0; padding: 9px 13px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg .meta { display: block; font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+.msg.user { background: var(--user-bg); margin-right: auto; }
+.msg.assistant { background: var(--bot-bg); margin-left: auto; }
+.msg.flagged { outline: 2px solid var(--flag-line); background: var(--flag-bg); }
+.msg .flag { font-size: 12px; font-weight: 600; }
+.login { max-width: 340px; margin: 12vh auto; }
+.login label { display: block; margin: 10px 0 4px; }

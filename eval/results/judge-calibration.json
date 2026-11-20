@@ -1,0 +1,9 @@
+{
+  "judge_model": "claude-sonnet-5-5",
+  "cases": 68,
+  "agreement": 68,
+  "agreement_rate": 1,
+  "required": 0.95,
+  "meets_requirement": true,
+  "disagreements": []
+}

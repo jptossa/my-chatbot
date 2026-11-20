@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escalation queue</title>
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+  <div id="bar"></div>
+  <main>
+    <div class="queue-head">
+      <h2>Escalations</h2>
+      <button type="button" id="refresh">Refresh</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div id="content"><p class="muted">Loading…</p></div>
+  </main>
+
+  <script src="/admin/common.js"></script>
+  <script>
+    document.getElementById("bar").replaceWith(topBar());
+    const content = document.getElementById("content");
+    const tabs = document.getElementById("tabs");
+
+    // Which list is showing; kept in the address so a reload or a shared link keeps it.
+    const FILTERS = ["open", "pending", "in_progress", "resolved"];
+    const FILTER_LABELS = { open: "Open", pending: "Pending", in_progress: "In progress", resolved: "Resolved" };
+    let filter = new URLSearchParams(location.search).get("status");
+    if (!FILTERS.includes(filter)) filter = "open";
+
+    function preview(text) {
+      if (!text) return "";
+      const flat = text.replace(/\s+/g, " ").trim();
+      return flat.length > 120 ? flat.slice(0, 117) + "…" : flat;
+    }
+
+    function renderTabs(counts) {
+      const number = { open: counts.pending + counts.in_progress, ...counts };
+      tabs.replaceChildren(...FILTERS.map((f) => {
+        const b = el("button", { type: "button", "aria-pressed": String(f === filter), text: `${FILTER_LABELS[f]} (${number[f]})` });
+        b.addEventListener("click", () => {
+          filter = f;
+          history.replaceState(null, "", f === "open" ? "/admin" : `/admin?status=${f}`);
+          load();
+        });
+        return b;
+      }));
+    }
+
+    function render({ total, counts, escalations }) {
+      renderTabs(counts);
+      if (escalations.length === 0) {
+        const none = filter === "resolved" ? "Nothing has been resolved yet." : "Nothing is waiting. 🎉";
+        content.replaceChildren(el("div", { class: "card empty muted", text: none }));
+        return;
+      }
+      const resolvedView = filter === "resolved";
+      const rows = escalations.map((e) => {
+        const link = el("a", { href: `/admin/escalations/${e.id}`, text: `#${e.id}` });
+        return el("tr", {},
+          el("td", {}, link),
+          el("td", {}, el("span", { class: "tag", text: triggerLabel(e.trigger_type), title: e.reason || "" })),
+          el("td", {}, el("span", { class: `tag status-${e.status}`, text: statusLabel(e.status) })),
+          el("td", { text: preview(e.flagged_message) }),
+          el("td", { class: "small", text: e.user_email || "Guest" }),
+          resolvedView
+            ? el("td", { class: "small", text: formatTime(e.resolved_at) })
+            : el("td", { class: "small", title: formatTime(e.created_at), text: waiting(e.created_at) })
+        );
+      });
+      const headers = ["ID", "Trigger", "Status", "Customer's message", "Customer", resolvedView ? "Resolved" : "Waiting"];
+      const head = el("tr", {}, ...headers.map((t) => el("th", { text: t })));
+      const note = total > escalations.length
+        ? el("p", { class: "muted small", text: `Showing ${escalations.length} of ${total}.` })
+        : null;
+      const table = el("table", {}, el("thead", {}, head), el("tbody", {}, ...rows));
+      content.replaceChildren(...[el("div", { class: "scroll" }, table), note].filter(Boolean));
+    }
+
+    async function load() {
+      try {
+        render(await getJson(`/api/admin/escalations?status=${filter}`));
+      } catch (error) {
+        content.replaceChildren(el("p", { class: "error", text: error.message }));
+      }
+    }
+    document.getElementById("refresh").addEventListener("click", load);
+    load();
+  </script>
+</body>
+</html>

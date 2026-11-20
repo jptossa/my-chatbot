@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escalation</title>
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+  <div id="bar"></div>
+  <main>
+    <a class="back" href="/admin">← Back to the queue</a>
+    <div id="content"><p class="muted">Loading…</p></div>
+  </main>
+
+  <script src="/admin/common.js"></script>
+  <script>
+    document.getElementById("bar").replaceWith(topBar());
+    const content = document.getElementById("content");
+    const id = location.pathname.split("/").pop();
+
+    function fact(label, value) {
+      return [el("dt", { text: label }), el("dd", {}, value)];
+    }
+
+    const MAX_NOTE = 500; // matches the server's limit
+
+    // Sends a status change; on success re-renders from the server's data.
+    async function changeStatus(escalationId, status, note, errorBox) {
+      errorBox.textContent = "";
+      const response = await fetch(`/api/admin/escalations/${escalationId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(note === undefined ? { status } : { status, note }),
+      });
+      if (response.status === 401 || response.status === 403) return location.reload();
+      if (response.ok) return load();
+      const body = await response.json().catch(() => ({}));
+      errorBox.textContent = body.error || `Could not update (${response.status}).`;
+      // A 409 means someone else changed it first: show the current state below.
+      if (response.status === 409) setTimeout(load, 1500);
+    }
+
+    // The buttons for what can be done next, depending on the current status.
+    function actionsCard(e) {
+      if (e.status === "resolved") return null;
+      const error = el("p", { class: "error small" });
+      const bar = el("div", { class: "actions" });
+      const button = (text, onClick, cls = "") => {
+        const b = el("button", { type: "button", class: cls, text });
+        b.addEventListener("click", async () => {
+          b.disabled = true;
+          try { await onClick(); } finally { b.disabled = false; }
+        });
+        return b;
+      };
+
+      if (e.status === "pending") {
+        bar.append(button("Start working", () => changeStatus(e.id, "in_progress", undefined, error), "primary"));
+      } else {
+        bar.append(button("Back to pending", () => changeStatus(e.id, "pending", undefined, error)));
+      }
+
+      // Resolving asks for an optional note first.
+      const note = el("textarea", {
+        rows: "3", maxlength: String(MAX_NOTE), id: "note",
+        placeholder: "What was done? (optional)",
+      });
+      const counter = el("span", { class: "muted small", text: `0 / ${MAX_NOTE}` });
+      note.addEventListener("input", () => { counter.textContent = `${note.value.length} / ${MAX_NOTE}`; });
+      const form = el("div", { class: "resolve-form", hidden: "" },
+        el("label", { for: "note", text: "Resolution note" }), note,
+        el("div", { class: "actions" },
+          button("Confirm resolved", () => changeStatus(e.id, "resolved", note.value, error), "primary"),
+          button("Cancel", () => { form.hidden = true; resolveBtn.hidden = false; }),
+          counter));
+      const resolveBtn = button("Mark resolved…", () => {
+        form.hidden = false; resolveBtn.hidden = true; note.focus();
+      });
+      bar.append(resolveBtn);
+      return el("div", { class: "card actions-card" }, bar, form, error);
+    }
+
+    function render({ escalation: e, messages, otherEscalations }) {
+      document.title = `Escalation #${e.id}`;
+
+      const facts = el("dl", { class: "facts" },
+        ...fact("Escalation", `#${e.id}`),
+        ...fact("Trigger", el("span", {}, el("span", { class: "tag", text: triggerLabel(e.trigger_type) }), " ", e.trigger_type)),
+        ...fact("Why", e.reason || "—"),
+        ...fact("Status", el("span", { class: `tag status-${e.status}`, text: statusLabel(e.status) })),
+        ...fact("Raised", `${formatTime(e.created_at)} (${waiting(e.created_at)} ago)`),
+        ...fact("Customer", e.user_email || "Guest (not logged in)"),
+        ...fact("Conversation", `#${e.conversation_id}, started ${formatTime(e.conversation_started_at)}`)
+      );
+      if (e.status === "resolved") {
+        facts.append(...fact("Resolved", `${formatTime(e.resolved_at)}${e.resolved_by_email ? " by " + e.resolved_by_email : ""}`));
+        facts.append(...fact("Resolution note", e.resolution_note
+          ? el("span", { class: "note", text: e.resolution_note })
+          : el("span", { class: "muted", text: "None" })));
+      }
+      if (otherEscalations.length > 0) {
+        const list = el("span", {});
+        otherEscalations.forEach((o, i) => {
+          if (i) list.append(", ");
+          list.append(el("a", { href: `/admin/escalations/${o.id}`, text: `#${o.id}` }), ` (${o.trigger_type}, ${o.status})`);
+        });
+        facts.append(...fact("Also in this conversation", list));
+      }
+
+      const thread = messages.map((m) => {
+        const flagged = m.id === e.flagged_message_id;
+        const meta = el("span", { class: "meta" },
+          m.role === "user" ? "Customer" : "Chatbot", " · ", formatTime(m.created_at),
+          flagged ? el("span", { class: "flag", text: "  ⚑ message that triggered this escalation" }) : null);
+        return el("div", { class: `msg ${m.role}${flagged ? " flagged" : ""}`, id: `m${m.id}` }, meta, m.content);
+      });
+
+      content.replaceChildren(...[
+        el("div", { class: "card" }, facts),
+        actionsCard(e),
+        el("h3", { text: `Conversation (${messages.length} messages)` }),
+        ...thread,
+      ].filter(Boolean));
+    }
+
+    let firstLoad = true;
+    function load() {
+      return getJson(`/api/admin/escalations/${encodeURIComponent(id)}`)
+        .then((data) => {
+          render(data);
+          // Jump to the flagged message only on arrival, not after each status change.
+          if (firstLoad) content.querySelector(".flagged")?.scrollIntoView({ block: "center" });
+          firstLoad = false;
+        })
+        .catch((error) => {
+          content.replaceChildren(el("p", { class: "error", text: error.status === 404 ? "That escalation doesn't exist." : error.message }));
+        });
+    }
+    load();
+  </script>
+</body>
+</html>

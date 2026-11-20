@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "server.js": {
+      "maxDuration": 60,
+      "includeFiles": "admin/**"
+    }
+  },
+  "regions": [
+    "iad1"
+  ]
+}

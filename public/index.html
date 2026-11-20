@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Chatbot</title>
+</head>
+<body>
+  <h1>My Chatbot</h1>
+
+  <div id="auth-out">
+    <form id="auth-form">
+      <input type="email" id="email" placeholder="Email" autocomplete="username" required>
+      <input type="password" id="password" placeholder="Password (8+ characters)" autocomplete="current-password" required>
+      <button type="submit" id="login">Log in</button>
+      <button type="button" id="signup">Sign up</button>
+    </form>
+  </div>
+  <div id="auth-in" hidden>
+    Logged in as <strong id="whoami"></strong>
+    <button type="button" id="logout">Log out</button>
+  </div>
+  <p id="auth-message"></p>
+
+  <hr>
+
+  <div id="history"></div>
+
+  <form id="chat-form">
+    <input type="text" id="message" placeholder="Type a message" autocomplete="off" autofocus>
+    <button type="submit" id="send">Send</button>
+  </form>
+
+  <script>
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("message");
+    const sendButton = document.getElementById("send");
+    const history = document.getElementById("history");
+
+    const authForm = document.getElementById("auth-form");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const authOut = document.getElementById("auth-out");
+    const authIn = document.getElementById("auth-in");
+    const whoami = document.getElementById("whoami");
+    const authMessage = document.getElementById("auth-message");
+
+    function addLine(speaker, text) {
+      const p = document.createElement("p");
+      const label = document.createElement("strong");
+      label.textContent = speaker + ": ";
+      p.appendChild(label);
+      p.appendChild(document.createTextNode(text)); // textContent-safe: no HTML injection
+      history.appendChild(p);
+    }
+
+    // The documents an answer was drawn from, shown under it.
+    function addSources(titles) {
+      if (!titles || titles.length === 0) return;
+      const p = document.createElement("p");
+      const small = document.createElement("small");
+      small.textContent = "Source: " + titles.join("; ");
+      p.appendChild(small);
+      history.appendChild(p);
+    }
+
+    // ---- accounts ----
+
+    function showUser(user) {
+      authOut.hidden = !!user;
+      authIn.hidden = !user;
+      whoami.textContent = user ? user.email : "";
+    }
+
+    async function postJson(url, body) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body || {}),
+      });
+      return { ok: res.ok, data: await res.json().catch(() => ({})) };
+    }
+
+    async function authenticate(path) {
+      authMessage.textContent = "";
+      const { ok, data } = await postJson(path, {
+        email: emailInput.value,
+        password: passwordInput.value,
+      });
+      if (ok) {
+        passwordInput.value = "";
+        showUser(data.user);
+        loadHistory(); // pick up the conversation that now belongs to this account
+      } else {
+        authMessage.textContent = data.error || "Something went wrong.";
+      }
+    }
+
+    authForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      authenticate("/api/login");
+    });
+    document.getElementById("signup").addEventListener("click", () => {
+      if (authForm.reportValidity()) authenticate("/api/signup");
+    });
+
+    document.getElementById("logout").addEventListener("click", async () => {
+      await postJson("/api/logout");
+      // The server also ended the visitor session; clear the screen to match,
+      // so the next person on this browser starts fresh.
+      history.textContent = "";
+      authMessage.textContent = "";
+      showUser(null);
+    });
+
+    // Show the server's saved conversation (replaces whatever is on screen).
+    async function loadHistory() {
+      try {
+        const res = await fetch("/api/history");
+        if (!res.ok) return;
+        const { messages } = await res.json();
+        history.textContent = "";
+        for (const m of messages) addLine(m.role === "user" ? "You" : "Claude", m.content);
+      } catch {
+        // Leave the page as it is if the history can't be loaded.
+      }
+    }
+
+    // On page load, find out whether we're already logged in, and show any
+    // conversation already in progress.
+    loadHistory();
+    fetch("/api/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => showUser(data ? data.user : null))
+      .catch(() => showUser(null));
+
+    // ---- chat ----
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const message = input.value.trim();
+      if (!message) return;
+
+      addLine("You", message);
+      input.value = "";
+      sendButton.disabled = true;
+
+      try {
+        // No session id to send: the browser's visitor cookie identifies this visitor.
+        const { ok, data } = await postJson("/api/chat", { message });
+        if (ok) {
+          addLine("Claude", data.reply);
+          addSources(data.sources);
+        } else {
+          addLine("Error", data.error || "Request failed");
+        }
+      } catch (err) {
+        addLine("Error", "Could not reach the server.");
+      } finally {
+        sendButton.disabled = false;
+        input.focus();
+      }
+    });
+  </script>
+</body>
+</html>

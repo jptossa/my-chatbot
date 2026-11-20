@@ -75,10 +75,59 @@ function buildSystemPrompt(docs) {
   if (docs.length === 0) {
     return `${rules}\n\nNo context document matched this message. Rely only on the earlier messages in this conversation; if they don't contain the answer, reply that you don't have that information.`;
   }
-  const context = docs
-    .map((doc) => `<context title="${doc.title}">\n${doc.content}\n</context>`)
-    .join("\n\n");
-  return `${rules}\n\n${context}`;
+  // The passages themselves are attached to the user's message as citable document
+  // blocks (see contentWithDocuments), so each claim in the reply can point at the
+  // exact words it came from.
+  return `${rules}\n\nThe context documents are attached to the user's latest message.`;
+}
+
+// The user's latest message with the retrieved passages attached as documents. With
+// citations enabled, Claude marks which exact words of which passage each part of
+// its reply rests on (the API returns them as `cited_text`; they cannot be invented).
+function contentWithDocuments(docs, message) {
+  if (docs.length === 0) return message;
+  return [
+    ...docs.map((doc) => ({
+      type: "document",
+      source: { type: "text", media_type: "text/plain", data: doc.content },
+      title: doc.title,
+      citations: { enabled: true },
+    })),
+    { type: "text", text: message },
+  ];
+}
+
+// Turns Claude's cited reply into what the page shows: the reply split into segments, each
+// with the numbers of the sources it rests on, and the list of sources themselves (the quote
+// Claude relied on, and the whole passage it sits in, so the page can highlight it there).
+function readCitations(content, docs) {
+  const sources = [];
+  const keyToNumber = new Map();
+  const segments = [];
+  for (const block of content) {
+    if (block.type !== "text") continue;
+    const numbers = [];
+    for (const c of block.citations ?? []) {
+      if (c.type !== "char_location" || !docs[c.document_index]) continue;
+      const key = `${c.document_index}:${c.start_char_index}:${c.end_char_index}`;
+      if (!keyToNumber.has(key)) {
+        const doc = docs[c.document_index];
+        sources.push({
+          number: sources.length + 1,
+          title: doc.title,
+          quote: c.cited_text,
+          passage: doc.content,
+          start: c.start_char_index,
+          end: c.end_char_index,
+        });
+        keyToNumber.set(key, sources.length);
+      }
+      const n = keyToNumber.get(key);
+      if (!numbers.includes(n)) numbers.push(n);
+    }
+    segments.push({ text: block.text, cites: numbers });
+  }
+  return { segments, sources };
 }
 
 const app = express();
@@ -299,7 +348,7 @@ app.post("/api/chat", chatLimit, async (req, res) => {
         betas: ["server-side-fallback-2026-07-01"],
         fallbacks: "default",
         // Earlier messages first, then the new one.
-        messages: [...history, { role: "user", content: message }],
+        messages: [...history, { role: "user", content: contentWithDocuments(docs, message) }],
       });
     } catch (callError) {
       if (reservedDay) {
@@ -347,8 +396,12 @@ app.post("/api/chat", chatLimit, async (req, res) => {
       reply.toLowerCase().includes(title.split("—").pop().trim().toLowerCase())
     );
     const declined = reply.startsWith(OUT_OF_SCOPE) || (NO_INFO_OPENING.test(reply) && named.length === 0);
-    const sources = declined ? [] : named.length > 0 ? named : titles.slice(0, 1);
-    res.json({ reply, sources, model });
+    const cited = declined ? { segments: [], sources: [] } : readCitations(response.content, docs);
+    // `sources` stays the list of document titles (older clients, the evaluations); `segments` and
+    // `citations` carry the exact quotes for the page.
+    const citedTitles = [...new Set(cited.sources.map((s) => s.title))];
+    const sources = declined ? [] : citedTitles.length > 0 ? citedTitles : named.length > 0 ? named : titles.slice(0, 1);
+    res.json({ reply, sources, segments: cited.segments, citations: cited.sources, model });
   } catch (error) {
     if (error instanceof Anthropic.AuthenticationError) {
       console.error("Anthropic authentication failed - check ANTHROPIC_API_KEY.");

@@ -3,167 +3,413 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Chatbot</title>
+  <title>GnomeGuard Help</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ground: #f7f6f2;
+      --surface: #ffffff;
+      --sunken: #efeee8;
+      --ink: #1b1d1a;
+      --muted: #666a63;
+      --faint: #8a8e86;
+      --line: #e4e2da;
+      --accent: #2c6b4c;          /* gnome-hat green: used on citations and the send button only */
+      --accent-ink: #ffffff;
+      --accent-tint: #e3efe7;
+      --highlight: #f6e7a6;       /* the exact words a claim rests on */
+      --warn-tint: #f5ecd9;
+      --radius: 18px;
+      --font: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --display: "Fraunces", Georgia, serif;
+      --panel-w: 400px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ground: #141613; --surface: #1c1f1b; --sunken: #232722; --ink: #ecede8; --muted: #a1a69c;
+        --faint: #7c8177; --line: #2e322c; --accent: #6fbf94; --accent-ink: #0f1a13; --accent-tint: #1f3228;
+        --highlight: #5a4f1c; --warn-tint: #332d1d;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    a { color: inherit; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+    [hidden] { display: none !important; }
+
+    /* ---- shell: header, thread, panel ---- */
+    .app { display: grid; grid-template-columns: minmax(0, 1fr) 0; height: 100dvh; transition: grid-template-columns .25s ease; }
+    .app.panel-open { grid-template-columns: minmax(0, 1fr) var(--panel-w); }
+    .main { display: flex; flex-direction: column; min-width: 0; height: 100dvh; }
+
+    header.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 24px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -0.01em; }
+    .brand svg { width: 28px; height: 28px; flex: none; }
+    .account { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); min-width: 0; }
+    .account .who { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+    .btn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 500; text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { background: var(--sunken); }
+    .btn.solid { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+    .btn.solid:hover { opacity: .88; background: var(--ink); }
+
+    .scroller { flex: 1; overflow-y: auto; scroll-behavior: smooth; }
+    .column { width: 100%; max-width: 740px; margin: 0 auto; padding: 8px 24px 24px; }
+
+    /* empty state */
+    .hello { padding: 9vh 0 8px; }
+    .hello h1 { font: 500 clamp(32px, 5vw, 46px)/1.1 var(--display); letter-spacing: -0.02em; margin: 0 0 12px; }
+    .hello p { margin: 0; color: var(--muted); max-width: 46ch; font-size: 17px; }
+    .suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+    .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-size: 14.5px; }
+    .chip:hover { background: var(--sunken); }
+
+    /* messages */
+    .turn { margin: 22px 0; display: flex; flex-direction: column; }
+    .turn.user { align-items: flex-end; }
+    .bubble { background: var(--sunken); border-radius: var(--radius); border-bottom-right-radius: 6px; padding: 10px 16px; max-width: 85%; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .answer { width: 100%; overflow-wrap: anywhere; }
+    .answer p { margin: 0 0 12px; }
+    .answer p:last-child { margin-bottom: 0; }
+    .answer ul, .answer ol { margin: 0 0 12px; padding-left: 22px; }
+    .answer h3, .answer h4 { font-size: 16px; margin: 16px 0 6px; }
+    .answer code { background: var(--sunken); padding: 1px 5px; border-radius: 5px; font-size: .92em; }
+    .tablewrap { overflow-x: auto; margin: 4px 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .answer table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+    .answer th, .answer td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+    .answer th { font-weight: 600; color: var(--muted); }
+    .answer tr:last-child td { border-bottom: 0; }
+    .note { display: inline-flex; align-items: center; gap: 8px; background: var(--warn-tint); border-radius: 999px; padding: 4px 12px 4px 10px; font-size: 13.5px; margin-bottom: 10px; }
+    .note i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .error { color: #b3261e; }
+
+    /* inline citation markers: the accent lives here */
+    .cite { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin: 0 1px 0 3px; vertical-align: 2px; border: 0; border-radius: 9px; background: var(--accent-tint); color: var(--accent); font-size: 11px; font-weight: 600; line-height: 1; }
+    .cite:hover, .cite.lit { background: var(--accent); color: var(--accent-ink); }
+
+    /* the quotes an answer rests on */
+    .basis { margin-top: 14px; }
+    .basis-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+    .quote { display: block; width: 100%; text-align: left; border: 0; background: var(--surface); border-radius: 12px; padding: 10px 14px 10px 14px; margin-bottom: 6px; position: relative; border: 1px solid var(--line); }
+    .quote:hover, .quote.lit { border-color: var(--accent); }
+    .quote .qn { color: var(--accent); font-weight: 600; font-size: 12px; margin-right: 6px; }
+    .quote .qt { color: var(--ink); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .quote .qs { display: block; font-size: 12.5px; color: var(--faint); margin-top: 4px; }
+    .more { border: 0; background: none; color: var(--muted); font-size: 13.5px; padding: 4px 2px; text-decoration: underline; text-underline-offset: 3px; }
+
+    /* thinking */
+    .thinking { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14.5px; }
+    .dots { display: inline-flex; gap: 4px; }
+    .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); animation: blink 1.2s infinite ease-in-out; }
+    .dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+    @keyframes blink { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }
+
+    /* ---- prompt box ---- */
+    .composer { padding: 0 24px 18px; }
+    .composer-inner { max-width: 740px; margin: 0 auto; }
+    .promptbox { display: flex; align-items: flex-end; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 8px 8px 8px 20px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .promptbox:focus-within { border-color: var(--faint); }
+    .promptbox textarea { flex: 1; border: 0; outline: 0; background: transparent; resize: none; font: inherit; color: var(--ink); padding: 8px 0; max-height: 180px; line-height: 1.5; }
+    .promptbox textarea::placeholder { color: var(--faint); }
+    .send { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
+    .send:disabled { background: var(--sunken); color: var(--faint); cursor: default; }
+    .send svg { width: 18px; height: 18px; }
+    .fine { text-align: center; font-size: 12.5px; color: var(--faint); margin: 10px 0 0; }
+
+    /* ---- sources panel ---- */
+    .panel { overflow: hidden; background: var(--surface); border-left: 1px solid var(--line); min-width: 0; }
+    .panel-inner { width: var(--panel-w); height: 100dvh; display: flex; flex-direction: column; }
+    .panel header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); font-weight: 600; }
+    .iconbtn { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; font-size: 20px; line-height: 1; color: var(--muted); }
+    .iconbtn:hover { background: var(--sunken); }
+    .panel-body { flex: 1; overflow-y: auto; padding: 16px 20px 28px; }
+    .src { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; scroll-margin-top: 12px; }
+    .src.lit { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+    .src h3 { margin: 0 0 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .src h3 .n { background: var(--accent-tint); color: var(--accent); border-radius: 9px; font-size: 11px; padding: 1px 7px; }
+    .src .passage { font-size: 14px; color: var(--muted); white-space: pre-wrap; margin: 0; overflow-wrap: anywhere; }
+    .src mark { background: var(--highlight); color: var(--ink); border-radius: 3px; padding: 1px 0; }
+    .src .where { font-size: 12.5px; color: var(--faint); margin-top: 8px; }
+
+    /* ---- sign-in dialog ---- */
+    dialog { border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--ink); padding: 24px; width: min(380px, calc(100vw - 32px)); }
+    dialog::backdrop { background: rgba(0,0,0,.35); }
+    dialog h2 { font: 500 24px/1.2 var(--display); margin: 0 0 4px; }
+    dialog p.sub { margin: 0 0 16px; color: var(--muted); font-size: 14.5px; }
+    dialog label { display: block; font-size: 13.5px; font-weight: 500; margin: 12px 0 4px; }
+    dialog input { width: 100%; border: 1px solid var(--line); background: var(--ground); color: var(--ink); border-radius: 12px; padding: 10px 12px; font: inherit; }
+    dialog .actions { display: flex; gap: 8px; margin-top: 18px; }
+    dialog .actions .btn { flex: 1; justify-content: center; padding: 10px 14px; }
+    #auth-message { min-height: 20px; margin: 10px 0 0; font-size: 13.5px; color: #b3261e; }
+
+    /* ---- phone: panel becomes a sheet ---- */
+    @media (max-width: 860px) {
+      .app, .app.panel-open { grid-template-columns: minmax(0, 1fr); }
+      .panel { position: fixed; inset: auto 0 0 0; height: 78dvh; border-left: 0; border-top: 1px solid var(--line); border-radius: 20px 20px 0 0; transform: translateY(105%); transition: transform .25s ease; z-index: 5; box-shadow: 0 -8px 30px rgba(0,0,0,.15); }
+      .app.panel-open .panel { transform: none; }
+      .panel-inner { width: 100%; height: 100%; }
+      header.bar { padding: 12px 16px; }
+      .column { padding: 4px 16px 20px; }
+      .composer { padding: 0 12px 12px; }
+      .bubble { max-width: 92%; }
+      .account .who { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+  </style>
 </head>
 <body>
-  <h1>My Chatbot</h1>
+  <div class="app" id="app">
+    <div class="main">
+      <header class="bar">
+        <div class="brand">
+          <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="var(--accent)"/><path d="M16 5 L23.5 20 H8.5 Z" fill="var(--accent-ink)"/><circle cx="16" cy="23" r="3.4" fill="var(--accent-ink)"/></svg>
+          GnomeGuard Help
+        </div>
+        <div class="account">
+          <div id="auth-out"><button type="button" class="btn" id="open-auth">Log in</button></div>
+          <div id="auth-in" hidden style="display:flex;align-items:center;gap:8px">
+            <span class="who" id="whoami"></span>
+            <a class="btn" id="admin-link" href="/admin/" hidden>Escalations dashboard</a>
+            <button type="button" class="btn" id="logout">Log out</button>
+          </div>
+        </div>
+      </header>
 
-  <div id="auth-out">
+      <div class="scroller" id="scroller">
+        <div class="column">
+          <section class="hello" id="hello">
+            <h1>How can we help with your gnomes?</h1>
+            <p>Ask about what your policy covers, how the plans compare, or how to file a claim. Answers come straight from our policy documents, with the exact words shown.</p>
+            <div class="suggestions" id="suggestions"></div>
+          </section>
+          <div id="thread" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="composer">
+        <form class="composer-inner" id="chat-form" autocomplete="off">
+          <div class="promptbox">
+            <textarea id="input" rows="1" placeholder="Ask about coverage, plans or claims" aria-label="Your message"></textarea>
+            <button type="submit" class="send" id="send" aria-label="Send" disabled>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M5 9l5-5 5 5"/></svg>
+            </button>
+          </div>
+          <p class="fine">Answers come from GnomeGuard's documents. For anything else, ask for a person.</p>
+        </form>
+      </div>
+    </div>
+
+    <aside class="panel" id="panel" aria-label="Sources">
+      <div class="panel-inner">
+        <header><span>Sources</span><button type="button" class="iconbtn" id="close-panel" aria-label="Close sources">&times;</button></header>
+        <div class="panel-body" id="panel-body"></div>
+      </div>
+    </aside>
+  </div>
+
+  <dialog id="auth-dialog">
+    <h2>Welcome</h2>
+    <p class="sub">Log in to keep your conversations, or create an account.</p>
     <form id="auth-form">
-      <input type="email" id="email" placeholder="Email" autocomplete="username" required>
-      <input type="password" id="password" placeholder="Password (8+ characters)" autocomplete="current-password" required>
-      <button type="submit" id="login">Log in</button>
-      <button type="button" id="signup">Sign up</button>
+      <label for="email">Email</label>
+      <input type="email" id="email" autocomplete="email" required>
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="8+ characters" autocomplete="current-password" required>
+      <div class="actions">
+        <button type="submit" class="btn solid" id="login">Log in</button>
+        <button type="button" class="btn" id="signup">Sign up</button>
+      </div>
+      <p id="auth-message" role="alert"></p>
     </form>
-  </div>
-  <div id="auth-in" hidden>
-    Logged in as <strong id="whoami"></strong>
-    <button type="button" id="logout">Log out</button>
-    <a id="admin-link" href="/admin/" hidden>Escalations dashboard</a>
-  </div>
-  <p id="auth-message"></p>
-
-  <hr>
-
-  <div id="history"></div>
-
-  <form id="chat-form">
-    <input type="text" id="message" placeholder="Type a message" autocomplete="off" autofocus>
-    <button type="submit" id="send">Send</button>
-  </form>
+  </dialog>
 
   <script>
-    const form = document.getElementById("chat-form");
-    const input = document.getElementById("message");
-    const sendButton = document.getElementById("send");
-    const history = document.getElementById("history");
+    const $ = (id) => document.getElementById(id);
+    const app = $("app"), thread = $("thread"), scroller = $("scroller"), input = $("input"), send = $("send");
+    let answers = {};      // answer id -> its citations, for the sources panel
+    let answerCount = 0;
 
-    const authForm = document.getElementById("auth-form");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const authOut = document.getElementById("auth-out");
-    const authIn = document.getElementById("auth-in");
-    const whoami = document.getElementById("whoami");
-    const authMessage = document.getElementById("auth-message");
+    // ---------- small helpers ----------
+    const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const shortTitle = (t) => t.replace(/^GnomeGuard Insurance\s*[—-]\s*/, "");
+    const MARK = (n) => `${n}`;
+    // Quotes come from markdown source: show them as plain readable text (keeps line breaks).
+    const plain = (s) => s
+      .replace(/^\s*\|?[\s:|-]*-{3,}[\s:|-]*\|?\s*$/gm, "")   // table separator rows
+      .replace(/^#+\s*/gm, "").replace(/\*\*|__/g, "").replace(/`/g, "")
+      .replace(/\s*\|\s*/g, " · ").replace(/^ · | · $/gm, "").replace(/( · ){2,}/g, " · ")
+      .replace(/\n{3,}/g, "\n\n");
 
-    function addLine(speaker, text) {
-      const p = document.createElement("p");
-      const label = document.createElement("strong");
-      label.textContent = speaker + ": ";
-      p.appendChild(label);
-      p.appendChild(document.createTextNode(text)); // textContent-safe: no HTML injection
-      history.appendChild(p);
+    // A small, safe markdown renderer: paragraphs, lists, headings, tables, bold, italic, code.
+    function inline(s) {
+      return s.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/(^|[\s(])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
+    }
+    function markdown(text) {
+      const lines = esc(text).split("\n"); const out = []; let i = 0;
+      while (i < lines.length) {
+        const line = lines[i];
+        if (!line.trim()) { i++; continue; }
+        if (/^\s*\|/.test(line) && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1] || "")) {
+          const row = (l) => l.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+          const head = row(line); i += 2; const body = [];
+          while (i < lines.length && /^\s*\|/.test(lines[i])) body.push(row(lines[i++]));
+          out.push(`<div class="tablewrap"><table><thead><tr>${head.map((c) => `<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>${body.map((r) => `<tr>${r.map((c) => `<td>${inline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+        } else if (/^\s*[-*]\s+/.test(line) || /^\s*\d+[.)]\s+/.test(line)) {
+          const ordered = /^\s*\d/.test(line); const items = [];
+          while (i < lines.length && (/^\s*[-*]\s+/.test(lines[i]) || /^\s*\d+[.)]\s+/.test(lines[i]))) items.push(lines[i++].replace(/^\s*(?:[-*]|\d+[.)])\s+/, ""));
+          out.push(`<${ordered ? "ol" : "ul"}>${items.map((t) => `<li>${inline(t)}</li>`).join("")}</${ordered ? "ol" : "ul"}>`);
+        } else if (/^#{1,4}\s+/.test(line)) {
+          out.push(`<h3>${inline(line.replace(/^#+\s+/, ""))}</h3>`); i++;
+        } else {
+          const para = [];
+          while (i < lines.length && lines[i].trim() && !/^\s*\|/.test(lines[i]) && !/^\s*([-*]|\d+[.)])\s+/.test(lines[i]) && !/^#{1,4}\s+/.test(lines[i])) para.push(lines[i++]);
+          out.push(`<p>${inline(para.join("<br>"))}</p>`);
+        }
+      }
+      return out.join("");
     }
 
-    // The documents an answer was drawn from, shown under it.
-    function addSources(titles) {
-      if (!titles || titles.length === 0) return;
-      const p = document.createElement("p");
-      const small = document.createElement("small");
-      small.textContent = "Source: " + titles.join("; ");
-      p.appendChild(small);
-      history.appendChild(p);
+    // ---------- messages ----------
+    function scrollDown() { scroller.scrollTop = scroller.scrollHeight; }
+    function hideHello() { $("hello").hidden = true; }
+
+    function addUser(text) {
+      hideHello();
+      const d = document.createElement("div"); d.className = "turn user";
+      d.innerHTML = `<div class="bubble">${esc(text)}</div>`;
+      thread.appendChild(d); scrollDown();
+    }
+    function addThinking() {
+      const d = document.createElement("div"); d.className = "turn";
+      d.innerHTML = `<div class="thinking"><span class="dots"><i></i><i></i><i></i></span><span>Looking through the policy documents…</span></div>`;
+      thread.appendChild(d); scrollDown(); return d;
     }
 
-    // ---- accounts ----
-
-    function showUser(user) {
-      authOut.hidden = !!user;
-      authIn.hidden = !user;
-      whoami.textContent = user ? user.email : "";
-      // Only a convenience: the server itself refuses the admin pages to anyone who is not a reviewer.
-      document.getElementById("admin-link").hidden = !(user && user.isReviewer);
+    // The answer, with a numbered marker after each cited passage and the quotes it rests on.
+    function renderAnswer(data) {
+      const id = ++answerCount;
+      const citations = data.citations || [];
+      answers[id] = citations;
+      let text;
+      if (data.segments && data.segments.length && citations.length) {
+        text = data.segments.map((s) => s.text + s.cites.map(MARK).join("")).join("");
+      } else text = data.reply;
+      let html = markdown(text).replace(/(\d+)/g, (_, n) => `<button type="button" class="cite" data-a="${id}" data-n="${n}" aria-label="Source ${n}">${n}</button>`);
+      const d = document.createElement("div"); d.className = "turn";
+      let basis = "";
+      if (citations.length) {
+        const row = (c) => `<button type="button" class="quote" data-a="${id}" data-n="${c.number}"><span class="qt"><span class="qn">${c.number}</span>&ldquo;${esc(plain(c.quote).replace(/\s+/g, " ").trim())}&rdquo;</span><span class="qs">${esc(shortTitle(c.title))}</span></button>`;
+        const first = citations.slice(0, 2).map(row).join("");
+        const rest = citations.slice(2);
+        basis = `<div class="basis"><div class="basis-label">What this is based on</div>${first}` +
+          (rest.length ? `<div class="restq" hidden>${rest.map(row).join("")}</div><button type="button" class="more">Show ${rest.length} more</button>` : "") + `</div>`;
+      }
+      const note = data.escalated ? `<div class="note"><i></i>Passed to our team</div>` : "";
+      d.innerHTML = `${note}<div class="answer">${html}</div>${basis}`;
+      thread.appendChild(d); scrollDown();
     }
+    function addPlain(text, cls) {
+      const d = document.createElement("div"); d.className = "turn";
+      d.innerHTML = `<div class="answer ${cls || ""}">${markdown(text)}</div>`;
+      thread.appendChild(d); scrollDown();
+    }
+
+    // ---------- sources panel: quote + the passage it sits in, highlighted ----------
+    function openSources(id, number) {
+      const cites = answers[id] || [];
+      $("panel-body").innerHTML = cites.map((c) => {
+        return `<article class="src" id="src-${c.number}"><h3><span class="n">${c.number}</span>${esc(shortTitle(c.title))}</h3><p class="passage">${esc(plain(c.passage.slice(0, c.start))).trimStart()}<mark>${esc(plain(c.passage.slice(c.start, c.end))).trim()}</mark>${esc(plain(c.passage.slice(c.end)))}</p><div class="where">Highlighted: the words this answer relied on</div></article>`;
+      }).join("");
+      app.classList.add("panel-open");
+      light(id, number);
+      const el = $("src-" + number);
+      if (el) { el.classList.add("lit"); setTimeout(() => el.scrollIntoView({ block: "nearest", behavior: "smooth" }), 60); }
+    }
+    function light(id, number) {
+      document.querySelectorAll(".cite.lit, .quote.lit").forEach((e) => e.classList.remove("lit"));
+      document.querySelectorAll(`[data-a="${id}"][data-n="${number}"]`).forEach((e) => e.classList.add("lit"));
+    }
+    $("close-panel").addEventListener("click", () => { app.classList.remove("panel-open"); document.querySelectorAll(".lit").forEach((e) => e.classList.remove("lit")); });
+    thread.addEventListener("click", (event) => {
+      const more = event.target.closest(".more");
+      if (more) { more.previousElementSibling.hidden = false; more.remove(); return; }
+      const t = event.target.closest(".cite, .quote");
+      if (t) openSources(t.dataset.a, t.dataset.n);
+    });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("close-panel").click(); });
+
+    // ---------- prompt box ----------
+    function resize() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 180) + "px"; send.disabled = !input.value.trim(); }
+    input.addEventListener("input", resize);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!send.disabled) $("chat-form").requestSubmit(); } });
+
+    const SUGGESTIONS = ["What does each plan cover?", "How do I file a claim?", "What isn't covered?", "Can I talk to a person?"];
+    $("suggestions").innerHTML = SUGGESTIONS.map((s) => `<button type="button" class="chip">${esc(s)}</button>`).join("");
+    $("suggestions").addEventListener("click", (e) => {
+      const c = e.target.closest(".chip"); if (!c) return;
+      input.value = c.textContent; resize(); $("chat-form").requestSubmit();
+    });
 
     async function postJson(url, body) {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body || {}),
-      });
-      return { ok: res.ok, data: await res.json().catch(() => ({})) };
+      const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+      let data = {}; try { data = await res.json(); } catch { /* not JSON */ }
+      return { ok: res.ok, data };
     }
 
-    async function authenticate(path) {
-      authMessage.textContent = "";
-      const { ok, data } = await postJson(path, {
-        email: emailInput.value,
-        password: passwordInput.value,
-      });
-      if (ok) {
-        passwordInput.value = "";
-        showUser(data.user);
-        loadHistory(); // pick up the conversation that now belongs to this account
-      } else {
-        authMessage.textContent = data.error || "Something went wrong.";
-      }
-    }
-
-    authForm.addEventListener("submit", (event) => {
+    $("chat-form").addEventListener("submit", async (event) => {
       event.preventDefault();
-      authenticate("/api/login");
-    });
-    document.getElementById("signup").addEventListener("click", () => {
-      if (authForm.reportValidity()) authenticate("/api/signup");
+      const message = input.value.trim(); if (!message) return;
+      addUser(message); input.value = ""; resize(); send.disabled = true;
+      const waiting = addThinking();
+      try {
+        const { ok, data } = await postJson("/api/chat", { message });
+        waiting.remove();
+        if (ok) renderAnswer(data); else addPlain(data.error || "Something went wrong. Please try again.", "error");
+      } catch {
+        waiting.remove(); addPlain("Could not reach the server. Please try again.", "error");
+      } finally { input.focus(); }
     });
 
-    document.getElementById("logout").addEventListener("click", async () => {
-      await postJson("/api/logout");
-      // The server also ended the visitor session; clear the screen to match,
-      // so the next person on this browser starts fresh.
-      history.textContent = "";
+    // ---------- account ----------
+    const dialog = $("auth-dialog"), authMessage = $("auth-message");
+    function showUser(user) {
+      $("auth-out").hidden = !!user;
+      $("auth-in").hidden = !user;
+      $("whoami").textContent = user ? user.email : "";
+      // Only a convenience: the server itself refuses the admin pages to anyone who is not a reviewer.
+      $("admin-link").hidden = !(user && user.isReviewer);
+    }
+    $("open-auth").addEventListener("click", () => { authMessage.textContent = ""; dialog.showModal(); $("email").focus(); });
+    dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
+    async function authenticate(url) {
       authMessage.textContent = "";
-      showUser(null);
+      const { ok, data } = await postJson(url, { email: $("email").value, password: $("password").value });
+      if (!ok) { authMessage.textContent = data.error || "Something went wrong."; return; }
+      $("password").value = ""; dialog.close(); showUser(data.user); loadHistory();
+    }
+    $("auth-form").addEventListener("submit", (e) => { e.preventDefault(); authenticate("/api/login"); });
+    $("signup").addEventListener("click", () => { if ($("auth-form").reportValidity()) authenticate("/api/signup"); });
+    $("logout").addEventListener("click", async () => {
+      await postJson("/api/logout");
+      thread.textContent = ""; answers = {}; $("hello").hidden = false; $("close-panel").click(); showUser(null);
     });
 
-    // Show the server's saved conversation (replaces whatever is on screen).
+    // The server's saved conversation (plain text: quotes are shown for new answers).
     async function loadHistory() {
       try {
-        const res = await fetch("/api/history");
-        if (!res.ok) return;
+        const res = await fetch("/api/history"); if (!res.ok) return;
         const { messages } = await res.json();
-        history.textContent = "";
-        for (const m of messages) addLine(m.role === "user" ? "You" : "Claude", m.content);
-      } catch {
-        // Leave the page as it is if the history can't be loaded.
-      }
+        thread.textContent = "";
+        for (const m of messages) { if (m.role === "user") addUser(m.content); else addPlain(m.content); }
+        $("hello").hidden = messages.length > 0;
+      } catch { /* leave the page as it is */ }
     }
-
-    // On page load, find out whether we're already logged in, and show any
-    // conversation already in progress.
     loadHistory();
-    fetch("/api/me")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => showUser(data ? data.user : null))
-      .catch(() => showUser(null));
-
-    // ---- chat ----
-
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const message = input.value.trim();
-      if (!message) return;
-
-      addLine("You", message);
-      input.value = "";
-      sendButton.disabled = true;
-
-      try {
-        // No session id to send: the browser's visitor cookie identifies this visitor.
-        const { ok, data } = await postJson("/api/chat", { message });
-        if (ok) {
-          addLine("Claude", data.reply);
-          addSources(data.sources);
-        } else {
-          addLine("Error", data.error || "Request failed");
-        }
-      } catch (err) {
-        addLine("Error", "Could not reach the server.");
-      } finally {
-        sendButton.disabled = false;
-        input.focus();
-      }
-    });
+    fetch("/api/me").then((r) => (r.ok ? r.json() : null)).then((d) => showUser(d ? d.user : null)).catch(() => showUser(null));
+    resize();
   </script>
 </body>
 </html>

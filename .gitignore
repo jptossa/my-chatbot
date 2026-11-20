@@ -6,5 +6,4 @@ data/
 *.log
 .claude/
 *.zip
-eval/results/run-4*
 eval/*.err
